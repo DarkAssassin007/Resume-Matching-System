@@ -1,0 +1,413 @@
+{% extends "base.html" %}
+
+{% block title %}Matching Results - Resume Matching System{% endblock %}
+
+{% block content %}
+<h2 class="mb-4"><i class="fas fa-chart-bar text-primary"></i> Matching Results</h2>
+
+<div class="card bg-gradient-primary text-white mb-4">
+    <div class="card-body">
+        <div class="d-flex justify-content-between align-items-start">
+            <div>
+                <h3 class="card-title text-white">Job: {{ job.job_title }}</h3>
+                <p class="mb-1"><strong>Description:</strong> {{ job.description[:200] }}{% if job.description|length > 200 %}...{% endif %}</p>
+                <p class="mb-1"><strong>Required Skills:</strong> 
+                    {% set skills = job.required_skills.split(',') %}
+                    {% for skill in skills %}
+                        <span class="badge bg-light text-dark me-1">{{ skill.strip() }}</span>
+                    {% endfor %}
+                </p>
+                <p class="mb-0"><strong>Created:</strong> {{ job.created_at }}</p>
+            </div>
+            <div class="text-end">
+                <h1 class="display-4 mb-0">{{ results|length }}</h1>
+                <p class="mb-0">Candidates Matched</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-9">
+        <div class="card">
+            <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+                <h3 class="mb-0"><i class="fas fa-users"></i> Top Candidates <span class="badge bg-light text-dark">{{ results|length }}</span></h3>
+                <div>
+                    <button class="btn btn-sm btn-outline-light me-2" id="filterToggle">
+                        <i class="fas fa-filter"></i> Filter
+                    </button>
+                    <button class="btn btn-sm btn-outline-light" id="exportResults">
+                        <i class="fas fa-download"></i> Export
+                    </button>
+                </div>
+            </div>
+            
+            <div class="card-body">
+                <!-- Filter Panel -->
+                <div id="filterPanel" class="mb-4 p-3 bg-light rounded" style="display: none;">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <label for="minScore" class="form-label">Minimum Score</label>
+                            <select class="form-select" id="minScore">
+                                <option value="0">All Scores</option>
+                                <option value="70">70%+</option>
+                                <option value="50">50%+</option>
+                                <option value="30">30%+</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="sortBy" class="form-label">Sort By</label>
+                            <select class="form-select" id="sortBy">
+                                <option value="score">Matching Score</option>
+                                <option value="name">Candidate Name</option>
+                                <option value="date">Date</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4 d-flex align-items-end">
+                            <button class="btn btn-primary w-100" id="applyFilters">
+                                <i class="fas fa-sync"></i> Apply
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                {% if results %}
+                    <div class="table-responsive">
+                        <table class="table table-hover" id="resultsTable">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Rank</th>
+                                    <th>Candidate Name</th>
+                                    <th>File Name</th>
+                                    <th>Matching Score</th>
+                                    <th>Matched Skills</th>
+                                    <th>Analyzed Date</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for result in results %}
+                                <tr data-score="{{ result.matching_score }}" data-name="{{ result.candidate_name }}">
+                                    <td><strong>#{{ loop.index }}</strong></td>
+                                    <td><strong>{{ result.candidate_name }}</strong></td>
+                                    <td>
+                                        <i class="fas fa-file-pdf text-danger me-1" v-if="result.file_name.endsWith('.pdf')"></i>
+                                        <i class="fas fa-file-word text-primary me-1" v-if="result.file_name.endsWith('.docx')"></i>
+                                        <i class="fas fa-file-alt text-secondary me-1" v-if="result.file_name.endsWith('.txt')"></i>
+                                        {{ result.file_name }}
+                                    </td>
+                                    <td>
+                                        {% if result.matching_score >= 70 %}
+                                            <span class="score-badge score-high">{{ result.matching_score }}%</span>
+                                        {% elif result.matching_score >= 40 %}
+                                            <span class="score-badge score-medium">{{ result.matching_score }}%</span>
+                                        {% else %}
+                                            <span class="score-badge score-low">{{ result.matching_score }}%</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if result.matched_skills %}
+                                            {% set skills = result.matched_skills.split(',') %}
+                                            {% for skill in skills[:3] %}
+                                                <span class="badge bg-secondary me-1">{{ skill.strip() }}</span>
+                                            {% endfor %}
+                                            {% if skills|length > 3 %}
+                                                <span class="badge bg-secondary">+{{ skills|length - 3 }} more</span>
+                                            {% endif %}
+                                        {% else %}
+                                            <span class="text-muted">None</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ result.created_at }}</td>
+                                    <td>
+                                        <div class="btn-group" role="group">
+                                            <button class="btn btn-sm btn-outline-primary candidate-preview" 
+                                                    data-bs-toggle="modal" 
+                                                    data-bs-target="#candidateModal" 
+                                                    data-name="{{ result.candidate_name }}" 
+                                                    data-score="{{ result.matching_score }}" 
+                                                    data-skills="{{ result.matched_skills or 'None' }}" 
+                                                    data-content="{{ result.file_content|e if result.file_content else 'Content not available' }}">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <a href="/download_resume/{{ result.resume_id }}" class="btn btn-sm btn-outline-success">
+                                                <i class="fas fa-download"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="text-center py-5">
+                        <i class="fas fa-user-friends fa-3x text-muted mb-3"></i>
+                        <h4 class="text-muted">No matching results available</h4>
+                        <p class="text-muted">Click the button below to run the matching algorithm.</p>
+                        <a href="/match_resumes/{{ job.id }}" class="btn btn-primary mt-3">
+                            <i class="fas fa-random"></i> Run Resume Matching
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card mb-4">
+            <div class="card-header bg-info text-white">
+                <h4 class="mb-0"><i class="fas fa-chart-pie"></i> Score Distribution</h4>
+            </div>
+            <div class="card-body">
+                <canvas id="scoreChart" width="200" height="200"></canvas>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h4 class="mb-0"><i class="fas fa-tachometer-alt"></i> Performance</h4>
+            </div>
+            <div class="card-body">
+                <div class="text-center">
+                    <div class="display-4 text-success mb-2">{{ results|selectattr('matching_score', '>=', 70)|list|length }}</div>
+                    <p class="mb-3">Excellent Matches</p>
+                    {% set excellent_count = results|selectattr('matching_score', '>=', 70)|list|length %}
+                    {% set total_count = results|length %}
+                    {% set percentage = (excellent_count / total_count * 100)|int if total_count > 0 else 0 %}
+                    <div class="progress mb-3" style="height: 20px;">
+                        <div class="progress-bar bg-success" role="progressbar" 
+                             data-width="{{ percentage }}"
+                             aria-valuenow="{{ percentage }}"
+                             aria-valuemin="0" aria-valuemax="100">
+                        </div>
+                    </div>
+                    <p class="small text-muted">High probability candidates</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <div class="card-header bg-warning text-white">
+        <h3 class="mb-0"><i class="fas fa-info-circle"></i> Understanding the Scores</h3>
+    </div>
+    <div class="card-body">
+        <div class="row text-center">
+            <div class="col-md-4 mb-3">
+                <div class="score-badge score-high mb-2" style="font-size: 1.2rem; padding: 10px 20px;">70-100%</div>
+                <h5>Excellent Match</h5>
+                <p class="text-muted">Highly recommended candidates who closely match the job requirements</p>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="score-badge score-medium mb-2" style="font-size: 1.2rem; padding: 10px 20px;">40-69%</div>
+                <h5>Good Match</h5>
+                <p class="text-muted">Worth considering candidates with moderate alignment to the role</p>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="score-badge score-low mb-2" style="font-size: 1.2rem; padding: 10px 20px;">0-39%</div>
+                <h5>Low Match</h5>
+                <p class="text-muted">Candidates who may not meet the core requirements</p>
+            </div>
+        </div>
+        <div class="alert alert-info mt-3 mb-0">
+            <strong>Algorithm:</strong> Matching score is calculated using TF-IDF similarity (70%) and skill match percentage (30%).
+        </div>
+    </div>
+</div>
+
+<div class="text-center">
+    <a href="/create_job" class="btn btn-primary me-2">
+        <i class="fas fa-briefcase"></i> Back to Jobs
+    </a>
+    <a href="/match_resumes/{{ job.id }}" class="btn btn-success">
+        <i class="fas fa-sync"></i> Re-run Matching
+    </a>
+    <a href="{{ spark_ui_url }}" target="_blank" class="btn btn-info ms-2">
+        <i class="fas fa-bolt"></i> View Spark Job Details
+    </a>
+</div>
+
+<!-- Candidate Preview Modal -->
+<div class="modal fade" id="candidateModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="candidateModalLabel">Candidate Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <div>
+                        <h4 id="modalCandidateName" class="mb-1"></h4>
+                        <div class="mb-2">
+                            <span class="badge bg-primary me-2">Score: <span id="modalScore"></span>%</span>
+                            <span class="badge bg-success">Matched Skills: <span id="modalSkillsCount"></span></span>
+                        </div>
+                    </div>
+                </div>
+                <h6 class="mb-2">Matched Skills:</h6>
+                <div id="modalSkills" class="mb-4"></div>
+                <h6 class="mb-2">Resume Content:</h6>
+                <div id="modalContent" class="bg-light p-3 rounded" style="max-height: 300px; overflow-y: auto;"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script id="template-data" type="application/json">
+{% if results %}{{ results|tojson }}{% else %}[]{% endif %}
+</script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+// Score distribution chart
+document.addEventListener('DOMContentLoaded', function() {
+    const ctx = document.getElementById('scoreChart').getContext('2d');
+    
+    // Set progress bar width
+    const progressBar = document.querySelector('.progress-bar');
+    if (progressBar) {
+        const width = progressBar.getAttribute('data-width') || '0';
+        progressBar.style.width = width + '%';
+    }
+    
+    // Calculate score distribution
+    const templateDataElement = document.getElementById('template-data');
+    const resultsData = JSON.parse(templateDataElement.textContent);
+    let excellent = 0, good = 0, low = 0;
+    
+    if (resultsData && Array.isArray(resultsData)) {
+        resultsData.forEach(result => {
+            if (result.matching_score >= 70) excellent++;
+            else if (result.matching_score >= 40) good++;
+            else low++;
+        });
+    }
+    
+    const scoreChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Excellent (70-100%)', 'Good (40-69%)', 'Low (0-39%)'],
+            datasets: [{
+                data: [excellent, good, low],
+                backgroundColor: [
+                    '#43e97b',
+                    '#f093fb',
+                    '#ff6b6b'
+                ],
+                borderWidth: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                }
+            }
+        }
+    });
+    
+    // Filter functionality
+    document.getElementById('filterToggle').addEventListener('click', function() {
+        const filterPanel = document.getElementById('filterPanel');
+        filterPanel.style.display = filterPanel.style.display === 'none' ? 'block' : 'none';
+    });
+    
+    document.getElementById('applyFilters').addEventListener('click', function() {
+        const minScore = parseInt(document.getElementById('minScore').value);
+        const sortBy = document.getElementById('sortBy').value;
+        
+        const rows = Array.from(document.querySelectorAll('#resultsTable tbody tr'));
+        
+        // Filter by score
+        rows.forEach(row => {
+            const score = parseInt(row.getAttribute('data-score'));
+            row.style.display = score >= minScore ? '' : 'none';
+        });
+        
+        // Sort
+        const visibleRows = rows.filter(row => row.style.display !== 'none');
+        visibleRows.sort((a, b) => {
+            if (sortBy === 'score') {
+                return parseInt(b.getAttribute('data-score')) - parseInt(a.getAttribute('data-score'));
+            } else if (sortBy === 'name') {
+                return a.getAttribute('data-name').localeCompare(b.getAttribute('data-name'));
+            } else {
+                return 0; // For date sorting, you'd need to parse the dates
+            }
+        });
+        
+        const tbody = document.querySelector('#resultsTable tbody');
+        visibleRows.forEach(row => tbody.appendChild(row));
+    });
+    
+    // Export functionality
+    document.getElementById('exportResults').addEventListener('click', function() {
+        // Create CSV content
+        let csvContent = "data:text/csv;charset=utf-8,";
+        csvContent += "Rank,Candidate Name,File Name,Matching Score,Matched Skills,Analyzed Date\n";
+        
+        const rows = document.querySelectorAll('#resultsTable tbody tr');
+        rows.forEach((row, index) => {
+            const cols = row.querySelectorAll('td');
+            if (cols.length >= 6) {
+                const rank = cols[0].textContent.trim();
+                const name = cols[1].textContent.trim();
+                const file = cols[2].textContent.trim();
+                const score = cols[3].textContent.trim();
+                const skills = cols[4].textContent.trim();
+                const date = cols[5].textContent.trim();
+                
+                csvContent += `"${rank}","${name}","${file}","${score}","${skills}","${date}"\n`;
+            }
+        });
+        
+        // Create download link
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", "matching_results_{{ job.job_title|replace(' ', '_') }}.csv");
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    });
+    
+    // Candidate preview modal
+    const candidateModal = document.getElementById('candidateModal');
+    candidateModal.addEventListener('show.bs.modal', function (event) {
+        const button = event.relatedTarget;
+        const name = button.getAttribute('data-name');
+        const score = button.getAttribute('data-score');
+        const skills = button.getAttribute('data-skills');
+        const content = button.getAttribute('data-content');
+        
+        document.getElementById('modalCandidateName').textContent = name;
+        document.getElementById('modalScore').textContent = score;
+        
+        // Display skills
+        const skillsContainer = document.getElementById('modalSkills');
+        skillsContainer.innerHTML = '';
+        if (skills && skills !== 'None') {
+            const skillArray = skills.split(',');
+            document.getElementById('modalSkillsCount').textContent = skillArray.length;
+            skillArray.forEach(skill => {
+                const skillBadge = document.createElement('span');
+                skillBadge.className = 'badge bg-secondary me-1';
+                skillBadge.textContent = skill.trim();
+                skillsContainer.appendChild(skillBadge);
+            });
+        } else {
+            document.getElementById('modalSkillsCount').textContent = '0';
+            skillsContainer.innerHTML = '<span class="text-muted">No matched skills</span>';
+        }
+        
+        document.getElementById('modalContent').textContent = content.substring(0, 1000) + (content.length > 1000 ? '...' : '');
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,348 @@
+{% extends "base.html" %}
+
+{% block title %}Create Job - Resume Matching System{% endblock %}
+
+{% block content %}
+<h2 class="mb-4"><i class="fas fa-briefcase text-success"></i> Create Job Description</h2>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h3 class="mb-0"><i class="fas fa-plus-circle"></i> Add New Job Description</h3>
+            </div>
+            <div class="card-body">
+                <form method="POST" id="jobForm">
+                    <div class="mb-3">
+                        <label for="job_title" class="form-label">Job Title <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="job_title" name="job_title" required placeholder="e.g., Senior Software Engineer">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Job Description <span class="text-danger">*</span></label>
+                        <div id="editor" style="min-height: 200px; border: 1px solid #ddd; border-radius: 5px; padding: 10px;"></div>
+                        <textarea id="description" name="description" class="d-none" required></textarea>
+                        <div class="form-text">Describe the role, responsibilities, and requirements in detail.</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="required_skills" class="form-label">Required Skills <span class="text-danger">*</span></label>
+                        <div class="skill-input-container">
+                            <input type="text" class="form-control" id="skillInput" placeholder="Type a skill and press Enter">
+                            <div id="skillsContainer" class="mt-2">
+                                <!-- Skills will be added here dynamically -->
+                            </div>
+                            <input type="hidden" id="required_skills" name="required_skills" required>
+                        </div>
+                        <div class="form-text">Press Enter after each skill to add it. Click on a skill to remove it.</div>
+                    </div>
+
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-save"></i> Create Job Description
+                    </button>
+                    <button type="button" class="btn btn-outline-secondary" id="clearForm">
+                        <i class="fas fa-eraser"></i> Clear Form
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h3 class="mb-0"><i class="fas fa-lightbulb"></i> Tips</h3>
+            </div>
+            <div class="card-body">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item"><i class="fas fa-check-circle text-success me-2"></i> Be specific about required skills</li>
+                    <li class="list-group-item"><i class="fas fa-check-circle text-success me-2"></i> Include both technical and soft skills</li>
+                    <li class="list-group-item"><i class="fas fa-check-circle text-success me-2"></i> Mention experience levels</li>
+                    <li class="list-group-item"><i class="fas fa-check-circle text-success me-2"></i> List certifications if required</li>
+                    <li class="list-group-item"><i class="fas fa-exclamation-circle text-warning me-2"></i> Avoid overly generic terms</li>
+                </ul>
+                <div class="alert alert-warning mt-3 mb-0">
+                    <i class="fas fa-info-circle"></i> <strong>Note:</strong> The more detailed your job description, the better the matching results.
+                </div>
+            </div>
+        </div>
+        
+        <div class="card mt-4">
+            <div class="card-header bg-primary text-white">
+                <h3 class="mb-0"><i class="fas fa-magic"></i> Suggested Skills</h3>
+            </div>
+            <div class="card-body">
+                <div class="d-flex flex-wrap gap-2">
+                    <span class="badge bg-primary skill-suggestion">Python</span>
+                    <span class="badge bg-primary skill-suggestion">Java</span>
+                    <span class="badge bg-primary skill-suggestion">JavaScript</span>
+                    <span class="badge bg-primary skill-suggestion">React</span>
+                    <span class="badge bg-primary skill-suggestion">Node.js</span>
+                    <span class="badge bg-primary skill-suggestion">SQL</span>
+                    <span class="badge bg-primary skill-suggestion">Machine Learning</span>
+                    <span class="badge bg-primary skill-suggestion">AWS</span>
+                    <span class="badge bg-primary skill-suggestion">Docker</span>
+                    <span class="badge bg-primary skill-suggestion">Kubernetes</span>
+                    <span class="badge bg-primary skill-suggestion">Communication</span>
+                    <span class="badge bg-primary skill-suggestion">Leadership</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card mt-4">
+    <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+        <h3 class="mb-0"><i class="fas fa-briefcase"></i> Job Descriptions <span class="badge bg-light text-dark">{{ jobs|length }}</span></h3>
+        <button class="btn btn-sm btn-outline-light" id="refreshJobs">
+            <i class="fas fa-sync-alt"></i> Refresh
+        </button>
+    </div>
+    
+    <div class="card-body">
+        {% if jobs %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>ID</th>
+                            <th>Job Title</th>
+                            <th>Required Skills</th>
+                            <th>Created Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for job in jobs %}
+                        <tr>
+                            <td>{{ job.id }}</td>
+                            <td><strong>{{ job.job_title }}</strong></td>
+                            <td>
+                                {% set skills = job.required_skills.split(',') %}
+                                {% for skill in skills %}
+                                    <span class="badge bg-secondary me-1">{{ skill.strip() }}</span>
+                                {% endfor %}
+                            </td>
+                            <td>{{ job.created_at }}</td>
+                            <td>
+                                <div class="btn-group" role="group">
+                                    <a href="/match_resumes/{{ job.id }}" class="btn btn-primary btn-sm">
+                                        <i class="fas fa-random"></i> Match
+                                    </a>
+                                    <a href="/results/{{ job.id }}" class="btn btn-info btn-sm">
+                                        <i class="fas fa-chart-bar"></i> Results
+                                    </a>
+                                    <button class="btn btn-sm btn-outline-secondary job-preview" 
+                                            data-bs-toggle="modal" 
+                                            data-bs-target="#jobPreviewModal" 
+                                            data-title="{{ job.job_title }}" 
+                                            data-description="{{ job.description|e }}" 
+                                            data-skills="{{ job.required_skills }}">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="text-center py-5">
+                <i class="fas fa-briefcase fa-3x text-muted mb-3"></i>
+                <h4 class="text-muted">No job descriptions created yet</h4>
+                <p class="text-muted">Create your first job description using the form above!</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Job Preview Modal -->
+<div class="modal fade" id="jobPreviewModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="jobPreviewModalLabel">Job Description Preview</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <h4 id="previewJobTitle" class="mb-3"></h4>
+                <h6 class="mb-2">Required Skills:</h6>
+                <div id="previewSkills" class="mb-4"></div>
+                <h6 class="mb-2">Description:</h6>
+                <div id="previewDescription" class="bg-light p-3 rounded"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.skill-tag {
+    display: inline-block;
+    background-color: #667eea;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 20px;
+    margin: 2px;
+    cursor: pointer;
+    font-size: 0.9em;
+}
+
+.skill-tag:hover {
+    background-color: #5568d3;
+}
+
+.skill-suggestion {
+    cursor: pointer;
+    font-size: 0.85em;
+}
+
+.skill-suggestion:hover {
+    transform: scale(1.05);
+    cursor: pointer;
+}
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/quill@2.0.0/dist/quill.js"></script>
+<link href="https://cdn.jsdelivr.net/npm/quill@2.0.0/dist/quill.snow.css" rel="stylesheet">
+
+<script>
+// Initialize Quill editor
+const quill = new Quill('#editor', {
+    modules: {
+        toolbar: [
+            [{ 'header': [1, 2, 3, false] }],
+            ['bold', 'italic', 'underline', 'strike'],
+            [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+            ['link', 'image'],
+            ['clean']
+        ]
+    },
+    placeholder: 'Enter the complete job description, responsibilities, and requirements...',
+    theme: 'snow'
+});
+
+// Skill tagging functionality
+let skills = [];
+const skillInput = document.getElementById('skillInput');
+const skillsContainer = document.getElementById('skillsContainer');
+const requiredSkillsInput = document.getElementById('required_skills');
+
+skillInput.addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+        e.preventDefault();
+        const skill = skillInput.value.trim();
+        if (skill && !skills.includes(skill)) {
+            skills.push(skill);
+            updateSkillsDisplay();
+            skillInput.value = '';
+        }
+    }
+});
+
+function updateSkillsDisplay() {
+    skillsContainer.innerHTML = '';
+    skills.forEach(skill => {
+        const skillTag = document.createElement('span');
+        skillTag.className = 'skill-tag';
+        skillTag.textContent = skill;
+        skillTag.addEventListener('click', () => {
+            skills = skills.filter(s => s !== skill);
+            updateSkillsDisplay();
+        });
+        skillsContainer.appendChild(skillTag);
+    });
+    requiredSkillsInput.value = skills.join(', ');
+}
+
+// Suggested skills
+document.querySelectorAll('.skill-suggestion').forEach(badge => {
+    badge.addEventListener('click', function() {
+        const skill = this.textContent;
+        if (!skills.includes(skill)) {
+            skills.push(skill);
+            updateSkillsDisplay();
+        }
+    });
+});
+
+// Form submission
+const jobForm = document.getElementById('jobForm');
+jobForm.addEventListener('submit', function(e) {
+    // Update hidden textarea with Quill content
+    document.getElementById('description').value = quill.root.innerHTML;
+    
+    // Validate form
+    const jobTitle = document.getElementById('job_title').value.trim();
+    const description = quill.getText().trim();
+    
+    if (!jobTitle) {
+        e.preventDefault();
+        alert('Please enter a job title');
+        return;
+    }
+    
+    if (!description) {
+        e.preventDefault();
+        alert('Please enter a job description');
+        return;
+    }
+    
+    if (skills.length === 0) {
+        e.preventDefault();
+        alert('Please add at least one required skill');
+        return;
+    }
+    
+    // Show loading state
+    const submitBtn = jobForm.querySelector('button[type="submit"]');
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating...';
+    submitBtn.disabled = true;
+});
+
+// Clear form
+document.getElementById('clearForm').addEventListener('click', function() {
+    jobForm.reset();
+    quill.setText('');
+    skills = [];
+    updateSkillsDisplay();
+});
+
+// Refresh button
+document.getElementById('refreshJobs').addEventListener('click', function() {
+    location.reload();
+});
+
+// Job preview modal
+const jobPreviewModal = document.getElementById('jobPreviewModal');
+jobPreviewModal.addEventListener('show.bs.modal', function (event) {
+    const button = event.relatedTarget;
+    const title = button.getAttribute('data-title');
+    const description = button.getAttribute('data-description');
+    const skills = button.getAttribute('data-skills');
+    
+    const previewTitle = jobPreviewModal.querySelector('#previewJobTitle');
+    const previewSkills = jobPreviewModal.querySelector('#previewSkills');
+    const previewDescription = jobPreviewModal.querySelector('#previewDescription');
+    
+    previewTitle.textContent = title;
+    
+    // Display skills
+    previewSkills.innerHTML = '';
+    if (skills) {
+        const skillArray = skills.split(',');
+        skillArray.forEach(skill => {
+            const skillBadge = document.createElement('span');
+            skillBadge.className = 'badge bg-secondary me-1';
+            skillBadge.textContent = skill.trim();
+            previewSkills.appendChild(skillBadge);
+        });
+    }
+    
+    previewDescription.innerHTML = description;
+});
+</script>
+{% endblock %}

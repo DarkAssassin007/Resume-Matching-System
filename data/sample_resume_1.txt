@@ -1,0 +1,42 @@
+John Doe
+Senior Software Engineer
+
+PROFESSIONAL SUMMARY
+Experienced software engineer with 8+ years in full-stack development, specializing in Python, Java, and cloud technologies. Proven track record in building scalable web applications and leading development teams.
+
+TECHNICAL SKILLS
+- Programming Languages: Python, Java, JavaScript, C++, SQL
+- Web Frameworks: Django, Flask, Spring Boot, React, Angular
+- Cloud Platforms: AWS, Azure, Google Cloud Platform
+- Databases: PostgreSQL, MongoDB, MySQL, Redis
+- DevOps Tools: Docker, Kubernetes, Jenkins, GitLab CI/CD
+- Machine Learning: TensorFlow, PyTorch, Scikit-learn
+- Other: Microservices, REST API, GraphQL, Agile/Scrum
+
+PROFESSIONAL EXPERIENCE
+
+Senior Software Engineer | Tech Corp Inc. | 2020 - Present
+- Led a team of 5 developers in building a cloud-based SaaS platform using Python and AWS
+- Implemented microservices architecture reducing system latency by 40%
+- Developed RESTful APIs serving 10M+ requests daily
+- Integrated machine learning models for predictive analytics
+
+Software Engineer | Innovation Labs | 2016 - 2020
+- Built full-stack web applications using Django, React, and PostgreSQL
+- Implemented CI/CD pipelines using Docker and Jenkins
+- Optimized database queries improving performance by 60%
+- Collaborated with cross-functional teams in Agile environment
+
+EDUCATION
+Bachelor of Science in Computer Science
+University of Technology, 2016
+
+CERTIFICATIONS
+- AWS Certified Solutions Architect
+- Certified Kubernetes Administrator (CKA)
+- Oracle Certified Java Programmer
+
+ACHIEVEMENTS
+- Published 3 technical papers on distributed systems
+- Open source contributor with 500+ GitHub stars
+- Won company hackathon for AI-powered automation tool

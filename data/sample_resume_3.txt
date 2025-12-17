@@ -1,0 +1,42 @@
+Michael Chen
+Full Stack Web Developer
+
+PROFESSIONAL PROFILE
+Creative and detail-oriented full-stack developer with 4 years of experience building responsive web applications. Specialized in modern JavaScript frameworks and cloud-native development.
+
+TECHNICAL EXPERTISE
+Frontend: HTML5, CSS3, JavaScript, TypeScript, React, Vue.js, Angular
+Backend: Node.js, Express, Python, Flask, Django
+Databases: MongoDB, PostgreSQL, MySQL, Firebase
+Cloud: AWS, Heroku, Netlify, Vercel
+Tools: Git, npm, Webpack, Babel, ESLint
+Testing: Jest, Mocha, Cypress, Selenium
+
+WORK HISTORY
+
+Full Stack Developer | WebSolutions LLC | 2020 - Present
+- Developed 15+ responsive web applications using React and Node.js
+- Implemented user authentication and authorization systems
+- Integrated third-party APIs (Stripe, PayPal, Google Maps)
+- Optimized website performance achieving 95+ Lighthouse scores
+- Mentored junior developers on best practices
+
+Frontend Developer | Creative Agency | 2019 - 2020
+- Built interactive user interfaces using React and Vue.js
+- Converted design mockups to pixel-perfect responsive pages
+- Implemented state management using Redux and Vuex
+- Ensured cross-browser compatibility and accessibility
+
+EDUCATION
+Bachelor of Computer Science
+Tech University, 2019
+
+PORTFOLIO PROJECTS
+E-commerce Platform: Full-stack application with payment integration
+Social Media Dashboard: Real-time analytics using WebSockets
+Task Management App: MERN stack with drag-and-drop functionality
+
+CERTIFICATIONS
+- React Developer Certification
+- AWS Cloud Practitioner
+- MongoDB Certified Developer

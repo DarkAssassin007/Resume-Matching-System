@@ -1,0 +1,44 @@
+Sarah Johnson
+Data Scientist & Machine Learning Engineer
+
+SUMMARY
+Passionate data scientist with expertise in machine learning, deep learning, and statistical analysis. 5 years of experience building predictive models and deploying ML solutions at scale.
+
+SKILLS
+- Programming: Python, R, SQL, Scala
+- ML/DL Frameworks: TensorFlow, PyTorch, Keras, Scikit-learn
+- Data Processing: Pandas, NumPy, Apache Spark, PySpark
+- Visualization: Matplotlib, Seaborn, Tableau, Power BI
+- Cloud: AWS SageMaker, Azure ML, Google Cloud AI
+- Big Data: Hadoop, Spark, Kafka
+- Tools: Jupyter, Git, Docker, MLflow
+
+EXPERIENCE
+
+Machine Learning Engineer | DataTech Solutions | 2021 - Present
+- Developed recommendation system using collaborative filtering serving 5M users
+- Built NLP models for sentiment analysis with 92% accuracy
+- Deployed ML models on AWS using SageMaker and Lambda
+- Implemented A/B testing framework for model evaluation
+
+Data Scientist | Analytics Pro | 2019 - 2021
+- Created predictive models for customer churn reducing attrition by 25%
+- Performed exploratory data analysis on datasets with 100M+ records
+- Built time-series forecasting models using LSTM and Prophet
+- Collaborated with business teams to translate requirements into ML solutions
+
+EDUCATION
+Master of Science in Data Science
+Data Science Institute, 2019
+
+Bachelor of Science in Statistics
+State University, 2017
+
+PROJECTS
+- Image Classification: Built CNN model achieving 95% accuracy on CIFAR-10
+- Customer Segmentation: K-means clustering for targeted marketing
+- Stock Price Prediction: LSTM-based forecasting with 85% accuracy
+
+PUBLICATIONS
+- "Deep Learning for Time Series Forecasting" - ML Conference 2022
+- "Scalable Recommendation Systems" - Data Science Journal 2021
