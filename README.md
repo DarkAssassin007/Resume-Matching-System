@@ -8,7 +8,7 @@
 An **intelligent recruitment automation system** that leverages **Apache Spark**, **PySpark ML**, and **TF-IDF algorithms** to match candidate resumes with job descriptions. Say goodbye to manual resume screening and hello to data-driven hiring decisions!
 
 <p align="center">
-  <img src="https://user-images.githubusercontent.com/placeholder-image.png" alt="Resume Matching System Demo" width="80%">
+  <img src="https://placehold.co/800x400/4A90E2/FFFFFF?text=Resume+Matching+System" alt="Resume Matching System Demo" width="80%">
 </p>
 
 ## ✨ Key Features
@@ -79,9 +79,9 @@ Visit `http://localhost:5000` to access the web interface!
 ## 🎨 Screenshots
 
 <div style="display: flex; justify-content: space-around; flex-wrap: wrap;">
-  <img src="https://user-images.githubusercontent.com/placeholder-dashboard.png" alt="Dashboard" width="30%">
-  <img src="https://user-images.githubusercontent.com/placeholder-upload.png" alt="Upload" width="30%">
-  <img src="https://user-images.githubusercontent.com/placeholder-results.png" alt="Results" width="30%">
+  <img src="https://placehold.co/300x200/5BA9F2/FFFFFF?text=Dashboard" alt="Dashboard" width="30%">
+  <img src="https://placehold.co/300x200/43E97B/FFFFFF?text=Upload" alt="Upload" width="30%">
+  <img src="https://placehold.co/300x200/F5576C/FFFFFF?text=Results" alt="Results" width="30%">
 </div>
 
 ## 📊 Matching Algorithm
